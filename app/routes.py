@@ -22,9 +22,8 @@ def load_products():
 def save_products(products_to_save):
     with open(PRODUCTS_FILE, 'w') as f:
         json.dump(products_to_save, f, indent=4)
-
         
-@main.route('/api') # Principal Route.
+@main.route('/') # Principal Route.
 def home():
     return render_template('index.html')
 
