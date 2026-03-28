@@ -12,8 +12,9 @@ CORS(app=auth_bp)
 
 SECRET_KEY = "5a82596bde152386cdc97fc3735256407e6c4260102761ff"
 
-USERS_FILE = os.path.join(os.getcwd(), 'user.json')
-PRODUCTS_FILE = os.path.join(os.getcwd(), 'products.json')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+USERS_FILE = os.path.join(BASE_DIR, 'user.json')
+PRODUCTS_FILE = os.path.join(BASE_DIR, 'products.json')
 
 def is_valid_email(email):
     regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
