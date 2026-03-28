@@ -25,7 +25,7 @@ def save_products(products_to_save):
         
 @main.route('/') # Principal Route.
 def home():
-    return render_template('index.html')
+    return render_template('login.html')
 
 @main.route('/logout/', methods=['POST']) # Route to log out of account.
 def logout():
