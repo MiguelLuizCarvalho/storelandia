@@ -9,8 +9,8 @@ CORS(app=main)
 
 get_products = []
 
-PRODUCTS_FILE = 'products.json'
-USERS_FILE = 'user.json'
+USERS_FILE = os.path.join(os.getcwd(), 'user.json')
+PRODUCTS_FILE = os.path.join(os.getcwd(), 'products.json')
 
 def load_products():
     if not os.path.exists(PRODUCTS_FILE):
