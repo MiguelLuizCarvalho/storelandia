@@ -11,7 +11,7 @@ registerBtn.addEventListener('click', async (e) => {
     const username = document.getElementById('register-username')?.value;
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
-    const confirmPassword = document.getElementById('register-confirm-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
     const role = document.getElementById('role-form').value;
 
     if (password !== confirmPassword) {
