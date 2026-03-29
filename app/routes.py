@@ -1,104 +1,103 @@
-from flask import render_template
-import os
+from flask import render_template, Blueprint, request, jsonify
 from flask_cors import CORS
-from flask import Blueprint, request, jsonify, json
 import uuid
+from .models import Product
+from . import db
 
 main = Blueprint('main', __name__)
 CORS(app=main)
 
-get_products = []
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-USERS_FILE = os.path.join(BASE_DIR, 'user.json')
-PRODUCTS_FILE = os.path.join(BASE_DIR, 'products.json')
-
-def load_products():
-    if not os.path.exists(PRODUCTS_FILE):
-        return []
-    with open(PRODUCTS_FILE, 'r') as f:
-        return json.load(f)
-    
-def save_products(products_to_save):
-    with open(PRODUCTS_FILE, 'w') as f:
-        json.dump(products_to_save, f, indent=4)
-        
-@main.route('/') # Principal Route.
+@main.route('/')
 def home():
     return render_template('login.html')
 
-@main.route('/logout/', methods=['POST']) # Route to log out of account.
-def logout():
-    return {"message": "Logout Successfully!"}, 200
+@main.route('/seller')
+def seller_page():
+    return render_template('seller.html')
 
-@main.route('/api/products/', methods=['GET']) # Route to see the products.
-def products():
-    products_list = load_products()
-    return jsonify(products_list)
+@main.route('/customer')
+def customer_page():
+    return render_template('customer.html')
 
-@main.route('/api/products/<product_id>/', methods=['GET']) # Route to access the product by UUID.
-def productsId(product_id):
-    products_list = load_products()
+# products routes, using SQLAlchemy to interact with the database
 
-    for p in products_list:
-        if p['id'] == product_id:
-            return p
-    return {"message": "Product not found."}, 404
-
-@main.route('/api/products/add/', methods=['POST']) # Route to add products.
-def add_product():
-    products_list = load_products()
-
-    productsId = str(uuid.uuid4())
-    newItem = {"description": "TV Smart 4K Oled", "id": productsId, "name": "Tv Smart", "price": 4589.0}
-
-    products_list.append(newItem)
-    save_products(products_list)
+@main.route('/api/products/', methods=['GET'])
+def get_all_products():
+    products_list = Product.query.all()
     
-    return {"message": "Saved products successfully!"}, 200
+    results = [
+        {"id": p.id, "name": p.name, "description": p.description, "price": p.price} 
+        for p in products_list
+    ]
+    return jsonify(results)
 
-@main.route('/api/products/update/<product_id>/', methods=['PUT']) # Route to update products by UUID.
-def update_product(product_id):
-    product_list = load_products()
-
-    newName = request.json.get('name')
-    newDescription = request.json.get('description')
-    newPrice = request.json.get('price')
-
-    updateProduct = next((p for p in product_list if p ['id'] == product_id), None)
-
-    if updateProduct:
-        updateProduct['nome'] = newName
-        updateProduct['description'] = newDescription
-        updateProduct['price'] = newPrice
-        save_products(product_list)
-        return {"message": "Product updated sucessfully!"}, 200
-
+@main.route('/api/products/<product_id>/', methods=['GET'])
+def get_product_by_id(product_id):
+    product = Product.query.get(product_id)
+    
+    if product:
+        return jsonify({
+            "id": product.id,
+            "name": product.name,
+            "description": product.description,
+            "price": product.price
+        })
     return {"message": "Product not found."}, 404
+
+@main.route('/api/products/add/', methods=['POST'])
+def add_product():
+    data = request.json
+    
+    new_item = Product(
+        id=str(uuid.uuid4()),
+        name=data.get('name', 'Produto Sem Nome'),
+        description=data.get('description', ''),
+        price=data.get('price', 0.0)
+    )
+
+    db.session.add(new_item)
+    db.session.commit()
+    
+    return {"message": "Saved product to database successfully!"}, 200
+
+@main.route('/api/products/update/<product_id>/', methods=['PUT'])
+def update_product(product_id):
+    product = Product.query.get(product_id)
+
+    if not product:
+        return {"message": "Product not found."}, 404
+
+    data = request.json
+    product.name = data.get('name', product.name)
+    product.description = data.get('description', product.description)
+    product.price = data.get('price', product.price)
+
+    db.session.commit()
+    return {"message": "Product updated successfully!"}, 200
 
 @main.route('/api/products/delete/<product_id>', methods=['DELETE'])
-def delete_produt(product_id):
-   products_list = load_products()
+def delete_product(product_id):
+    product = Product.query.get(product_id)
 
-   removeProduct = next((p for p in products_list if p['id'] == product_id), None)
+    if product:
+        db.session.delete(product)
+        db.session.commit()
+        return {"message": "Product deleted successfully!"}, 200
 
-   if removeProduct:
-       products_list.remove(removeProduct)
-       save_products(products_list)
-       return {"message": "Product deleted sucesfully!"}, 200
-
-   return {"message": "Product not found by UUID."}, 404
+    return {"message": "Product not found."}, 404
 
 @main.route('/api/market/search/', methods=['GET'])
 def search_products():
-    products_list = load_products()
     query = request.args.get('q', '').lower()
+    
+    results = Product.query.filter(
+        (Product.name.ilike(f'%{query}%')) | 
+        (Product.description.ilike(f'%{query}%'))
+    ).all()
 
-    if query:
-        results = [
-            p for p in products_list
-            if query in p['name'].lower() or query in p['description'].lower()
-        ]
-        return jsonify(results)
-
-    return render_template('index.html')
+    formatted_results = [
+        {"id": p.id, "name": p.name, "description": p.description, "price": p.price} 
+        for p in results
+    ]
+    
+    return jsonify(formatted_results)

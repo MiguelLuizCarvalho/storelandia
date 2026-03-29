@@ -63,7 +63,7 @@ loginBtn.addEventListener('click', async () => {
 
     const data = {
         login: loginInput,
-        password: password
+        password: password,
     };
 
     const response = await fetch('/login/', {
@@ -76,11 +76,21 @@ loginBtn.addEventListener('click', async () => {
 
     if (response.ok) {
         alert(result.message);
+
+        // Store the token in local Storage for later use.
         localStorage.setItem('token', result.token);
-        window.location.href = '/';
+
+        // Redirect based on user role selected during registration
+        if (result.role === 'seller') {
+            window.location.href = '/seller';
+        } else {
+            window.location.href = '/customer';
+        }
+
     } else {
         alert(result.message);
     }
+
 });
 
 function setupPasswordToggle(toggleId, inputId) {
