@@ -73,24 +73,21 @@ loginBtn.addEventListener('click', async () => {
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Server error:', errorText);
-        alert('An error occured during login. See the console.')
+        const result = await response.json();
 
-        // Store the token in local Storage for later use.
+        alert(result.message);
         localStorage.setItem('token', result.token);
 
-        // Redirect based on user role selected during registration
         if (result.role === 'seller') {
             window.location.href = '/seller';
         } else {
             window.location.href = '/customer';
         }
 
-        return;
-
     } else {
-        alert(result.message);
+        const errorText = await response.text();
+        console.error('Error:', errorText);
+        alert('Username or password is incorrect. Please try again.');
     }
 
     const result = await response.json();
