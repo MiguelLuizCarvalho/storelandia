@@ -15,7 +15,7 @@ registerBtn.addEventListener('click', async (e) => {
     const role = document.getElementById('role-form').value;
 
     if (password !== confirmPassword) {
-        alert("As senhas não coincidem! Digite novamente.");
+        window.alert("As senhas não coincidem! Digite novamente.");
         return;
     }
 
@@ -35,11 +35,23 @@ registerBtn.addEventListener('click', async (e) => {
     const result = await response.json();
 
     if (response.ok) {
-        alert("Account created successfully! Please log in.");
+
+        const result = await response.json();
+
+        alert(result.message);
+        localStorage.setItem('token', result.token);
+
+        if (result.role === 'seller') {
+            window.location.href = '/seller';
+        } else {
+            window.location.href = '/customer';
+        }
+
+        window.alert("Account created successfully! Please log in.");
         registerCard.style.display = 'none';
         loginCard.style.display = 'block';
     } else {
-        alert(result.message);
+        window.alert(result.message);
     }
 });
 
