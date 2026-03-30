@@ -72,25 +72,27 @@ loginBtn.addEventListener('click', async () => {
         body: JSON.stringify(data)
     });
 
-    const result = await response.json();
-
-    if (response.ok) {
-        alert(result.message);
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server error:', errorText);
+        alert('An error occured during login. See the console.')
+        return;
 
         // Store the token in local Storage for later use.
         localStorage.setItem('token', result.token);
 
         // Redirect based on user role selected during registration
         if (result.role === 'seller') {
-            window.location.href = '/seller';
+            window.location.href = '/seller.html';
         } else {
-            window.location.href = '/customer';
+            window.location.href = '/customer.html';
         }
 
     } else {
         alert(result.message);
     }
 
+    const result = await response.json();
 });
 
 function setupPasswordToggle(toggleId, inputId) {
