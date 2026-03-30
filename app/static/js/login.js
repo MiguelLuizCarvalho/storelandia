@@ -58,7 +58,7 @@ btnToLogin.addEventListener('click', (e) => {
 });
 
 loginBtn.addEventListener('click', async () => {
-    const loginInput = document.getElementById('email').value;
+    const loginInput = document.getElementById('login-email-username').value;
     const password = document.getElementById('password').value;
 
     const data = {
