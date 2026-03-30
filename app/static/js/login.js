@@ -32,13 +32,10 @@ registerBtn.addEventListener('click', async (e) => {
         body: JSON.stringify(data)
     });
 
-    const result = await response.json();
-
     if (response.ok) {
-
         const result = await response.json();
 
-        alert(result.message);
+        window.alert(result.message);
         localStorage.setItem('token', result.token);
 
         if (result.role === 'seller') {
@@ -87,7 +84,7 @@ loginBtn.addEventListener('click', async () => {
     if (response.ok) {
         const result = await response.json();
 
-        alert(result.message);
+        window.alert(result.message);
         localStorage.setItem('token', result.token);
 
         if (result.role === 'seller') {
@@ -99,7 +96,7 @@ loginBtn.addEventListener('click', async () => {
     } else {
         const errorText = await response.text();
         console.error('Error:', errorText);
-        alert('Username or password is incorrect. Please try again.');
+        window.alert('Username or password is incorrect. Please try again.');
     }
 
 });
