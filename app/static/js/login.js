@@ -90,7 +90,6 @@ loginBtn.addEventListener('click', async () => {
         alert('Username or password is incorrect. Please try again.');
     }
 
-    const result = await response.json();
 });
 
 function setupPasswordToggle(toggleId, inputId) {
