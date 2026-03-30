@@ -76,17 +76,18 @@ loginBtn.addEventListener('click', async () => {
         const errorText = await response.text();
         console.error('Server error:', errorText);
         alert('An error occured during login. See the console.')
-        return;
 
         // Store the token in local Storage for later use.
         localStorage.setItem('token', result.token);
 
         // Redirect based on user role selected during registration
         if (result.role === 'seller') {
-            window.location.href = '/seller.html';
+            window.location.href = '/seller';
         } else {
-            window.location.href = '/customer.html';
+            window.location.href = '/customer';
         }
+
+        return;
 
     } else {
         alert(result.message);
